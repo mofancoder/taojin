@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj.bet.dao.UserBalanceInfoMapperEx">
+    <update id="addSysBetAmount" parameterType="map">
+        update t_user_balance_info
+        set amount=amount + #{amount}
+        where user_id = #{userId}
+    </update>
+    <update id="addRebateAmount" parameterType="map">
+        update t_user_balance_info
+        set amount=amount + #{amount}
+        where user_id = #{userId}
+    </update>
+
+
+    <update id="cutBetAmount" parameterType="map">
+        update t_user_balance_info
+        set amount=amount - #{amount}
+        where user_id = #{userId}
+          and amount >= #{amount}
+    </update>
+</mapper>

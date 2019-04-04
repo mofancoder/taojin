@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj.transaction.dao.UserTransactionRecdMapperEx">
+    <resultMap id="userTransactionMap" type="com.tj.dto.UserTransactionRecdDto">
+        <result property="actualAmount" column="actual_amount" jdbcType="DECIMAL"/>
+        <result property="amount" column="amount" jdbcType="DECIMAL"/>
+        <result property="auditRemark" column="audit_remark" jdbcType="VARCHAR"/>
+        <result property="auditStatus" column="audit_status" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="fee" column="fee" jdbcType="DECIMAL"/>
+        <result property="feeRatio" column="fee_ratio" jdbcType="DECIMAL"/>
+        <result property="platform" column="platform" jdbcType="INTEGER"/>
+        <result property="recdStatus" column="recd_status" jdbcType="INTEGER"/>
+        <result property="targetAddr" column="target_addr" jdbcType="VARCHAR"/>
+        <result property="transactionId" column="transaction_id" jdbcType="BIGINT"/>
+        <result property="transactionType" column="transaction_type" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+    </resultMap>
+    <resultMap id="adminTransactionMap" type="com.tj.dto.AdminTransactionRecdDto">
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="transactionId" column="transaction_id" jdbcType="BIGINT"/>
+        <result property="targetAddr" column="target_addr" jdbcType="VARCHAR"/>
+        <result property="recdStatus" column="recd_status" jdbcType="INTEGER"/>
+        <result property="feeRatio" column="fee_ratio" jdbcType="DECIMAL"/>
+        <result property="fee" column="fee" jdbcType="DECIMAL"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="auditStatus" column="audit_status" jdbcType="INTEGER"/>
+        <result property="auditRemark" column="audit_remark" jdbcType="VARCHAR"/>
+        <result property="amount" column="amount" jdbcType="DECIMAL"/>
+        <result property="actualAmount" column="actual_amount" jdbcType="DECIMAL"/>
+        <result property="auditTime" column="audit_time" jdbcType="TIMESTAMP"/>
+        <result property="auditUser" column="audit_user" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="recdType" column="recd_type" jdbcType="INTEGER"/>
+        <result property="sysRemark" column="sys_remark" jdbcType="VARCHAR"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="snapshot" column="snapshot" jdbcType="VARCHAR"/>
+        <result property="thirdPartyId" column="third_party_id" jdbcType="VARCHAR"/>
+        <result property="platform" column="platform" jdbcType="INTEGER"/>
+        <result property="userRemark" column="user_remark" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="adminSumMap" type="com.tj.dto.AdminTransactionSumDto">
+        <result property="chargeAmount" jdbcType="DECIMAL" column="charge_amount"/>
+        <result property="chargeCount" jdbcType="INTEGER" column="charge_count"/>
+        <result property="totalAmount" jdbcType="DECIMAL" column="total_amount"/>
+        <result property="totalCount" jdbcType="INTEGER" column="total_count"/>
+        <result property="withdrawAmount" jdbcType="DECIMAL" column="withdraw_amount"/>
+        <result property="withdrawCount" jdbcType="INTEGER" column="withdraw_count"/>
+    </resultMap>
+    <resultMap id="userSumMap" type="com.tj.dto.UserTransactionSumDto">
+        <result property="chargeAmount" jdbcType="DECIMAL" column="charge_amount"/>
+        <result property="chargeCount" jdbcType="INTEGER" column="charge_count"/>
+        <result property="totalAmount" jdbcType="DECIMAL" column="total_amount"/>
+        <result property="totalCount" jdbcType="INTEGER" column="total_count"/>
+        <result property="withdrawAmount" jdbcType="DECIMAL" column="withdraw_amount"/>
+        <result property="withdrawCount" jdbcType="INTEGER" column="withdraw_count"/>
+    </resultMap>
+    <select id="list" resultMap="userTransactionMap" parameterType="map">
+        select
+        actual_amount,
+        amount,
+        audit_remark,
+        audit_status,
+        create_time,
+        fee,
+        fee_ratio,
+        platform,
+        recd_status,
+        target_addr,
+        id as transaction_id,
+        recd_type as transaction_type
+        from t_user_transaction_recd
+        <where>
+            <if test="userId !=null">
+                user_id=#{userId}
+            </if>
+            <if test="transactionType !=null">
+                and recd_type=#{transactionType}
+            </if>
+            <if test="startTime !=null">
+                and create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime !=null">
+                and create_time &lt;=#{endTime}
+            </if>
+            <if test="platform !=null">
+                and platform =#{platform}
+            </if>
+            <if test="recdStatus !=null">
+                and recd_status =#{recdStatus}
+            </if>
+        </where>
+         order by create_time desc
+    </select>
+    <select id="listTransaction" resultMap="adminTransactionMap" parameterType="map">
+        select
+        r.id as transaction_id,
+        r.recd_type,
+        u.user_id as user_id,
+        u.account as username,
+        u.phone,
+        r.amount,
+        r.actual_amount,
+        r.fee,
+        r.fee_ratio,
+        r.target_addr,
+        r.create_time,
+        r.audit_status,
+        r.recd_status,
+        r.audit_remark,
+        r.sys_remark,
+        au.account as audit_user,
+        r.audit_time,
+        r.snapshot,
+        r.third_party_id,
+        r.platform,
+        r.user_remark
+        from t_user_transaction_recd r
+        left join t_user_info u on r.user_id=u.user_id
+        left join t_user_info au on r.audit_user=au.user_id
+        <where>
+            <if test="type !=null">
+                r.recd_type=#{type}
+            </if>
+            <if test="recdStatus !=null">
+                and recd_status=#{recdStatus}
+            </if>
+            <if test="auditStatus !=null">
+                and audit_status=#{auditStatus}
+            </if>
+            <if test="username !=null">
+                and u.account=#{username}
+            </if>
+            <if test="phone !=null">
+                and u.phone=#{phone}
+            </if>
+            <if test="transactionId !=null">
+                and r.id=#{transactionId}
+            </if>
+            <if test="startTime !=null">
+                and r.create_time &gt;=#{startTime}
+            </if>
+            <if test="endTime !=null">
+                and r.create_time &lt;=#{endTime}
+            </if>
+        </where>
+        order by r.create_time desc
+    </select>
+    <select id="sumTransaction" resultMap="adminSumMap" parameterType="map">
+        select
+        count(id) as total_count,
+        sum(amount) as total_amount,
+        sum(if (recd_type=1,1,0)) as charge_count,
+        sum(if(recd_type=1,amount,0)) as charge_amount,
+        sum(if (recd_type=2,1,0)) as withdraw_count,
+        sum(if(recd_type=2,amount,0)) as withdraw_amount
+        from t_user_transaction_recd r
+        left join t_user_info u on r.user_id=u.user_id
+        left join t_user_info au on r.audit_user=au.user_id
+        <where>
+            <if test="type !=null">
+                r.recd_type=#{type}
+            </if>
+            <if test="recdStatus !=null">
+                and recd_status=#{recdStatus}
+            </if>
+            <if test="auditStatus !=null">
+                and audit_status=#{auditStatus}
+            </if>
+            <if test="username !=null">
+                and u.account=#{username}
+            </if>
+            <if test="phone !=null">
+                and u.phone=#{phone}
+            </if>
+            <if test="transactionId !=null">
+                and r.id=#{transactionId}
+            </if>
+            <if test="startTime !=null">
+                and r.create_time &gt;=#{startTime}
+            </if>
+            <if test="endTime !=null">
+                and r.create_time &lt;=#{endTime}
+            </if>
+        </where>
+        order by r.create_time desc
+    </select>
+    <select id="sumUserTransaction" resultMap="userSumMap" parameterType="map">
+        select
+        count(id) as total_count,
+        sum(amount) as total_amount,
+        sum(if (recd_type=1,1,0)) as charge_count,
+        sum(if(recd_type=1,amount,0)) as charge_amount,
+        sum(if (recd_type=2,1,0)) as withdraw_count,
+        sum(if(recd_type=2,amount,0)) as withdraw_amount
+        from t_user_transaction_recd
+        <where>
+            <if test="userId !=null">
+                user_id=#{userId}
+            </if>
+            <if test="transactionType !=null">
+                and recd_type=#{transactionType}
+            </if>
+                and create_time &gt;= #{startTime}
+            <if test="startTime !=null">
+            </if>
+            <if test="endTime !=null">
+                and create_time &lt;=#{endTime}
+            </if>
+            <if test="platform !=null">
+                and platform =#{platform}
+            </if>
+            <if test="recdStatus !=null">
+                and recd_status =#{recdStatus}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+</mapper>

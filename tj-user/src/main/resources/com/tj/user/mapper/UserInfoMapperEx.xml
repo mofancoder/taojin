@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj.user.dao.UserMapperEx">
+    <resultMap id="inviteMap" type="com.tj.dto.InviteInfoDto">
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="parentAccount" column="parent_account" jdbcType="VARCHAR"/>
+        <result property="parentPhone" column="parent_phone" jdbcType="VARCHAR"/>
+        <result property="parentId" column="parent_id" jdbcType="VARCHAR"/>
+        <collection property="children" resultMap="childrenMap"></collection>
+    </resultMap>
+    <resultMap id="childrenMap" type="com.tj.dto.ChildInfo">
+        <result property="childId" column="child_id" jdbcType="INTEGER"/>
+        <result property="childAccount" column="child_account" jdbcType="VARCHAR"/>
+        <result property="childPhone" column="child_phone" jdbcType="VARCHAR"/>
+        <result property="registTime" column="regist_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <resultMap id="UserMap" type="com.tj.dto.UserInfoDto">
+
+        <id column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="account" jdbcType="VARCHAR" property="account"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="phone_area_code" jdbcType="VARCHAR" property="phoneAreaCode"/>
+        <result column="invite_code" jdbcType="VARCHAR" property="inviteCode"/>
+        <result column="nationality" jdbcType="VARCHAR" property="nationality"/>
+        <result column="sys_status" jdbcType="TINYINT" property="sysStatus"/>
+        <result column="regist_time" jdbcType="TIMESTAMP" property="registTime"/>
+        <result column="last_login_time" jdbcType="TIMESTAMP" property="lastLoginTime"/>
+        <result column="opt_status" jdbcType="TINYINT" property="optStatus"/>
+        <result column="proxy" jdbcType="INTEGER" property="proxy"/>
+        <result property="amount" column="amount" jdbcType="DECIMAL"/>
+        <result property="freezeAmount" column="freazon_amount" jdbcType="DECIMAL"/>
+    </resultMap>
+    <select id="getUserInviteInfo" resultMap="inviteMap" parameterType="map">
+        select
+        p.invited_user_id as user_id,
+        p.invite_user_id as parent_id,
+        pu.account as parent_account,
+        pu.phone as parent_phone,
+        sr.invited_user_id as child_id,
+        su.account as child_account,
+        su.phone as child_phone,
+        su.regist_time
+        from
+        t_user_info u
+        left join t_regist_invite_recd p on u.user_id=p.invited_user_id
+        left join t_user_info pu on pu.user_id=p.invite_user_id
+        left join t_regist_invite_recd sr on sr.invite_user_id=u.user_id
+        left join t_user_info su on su.user_id=sr.invited_user_id
+        <where>
+            <if test="userId !=null">
+                u.user_id=#{userId}
+            </if>
+        </where>
+    </select>
+    <select id="listUser" resultMap="UserMap" parameterType="map">
+        select u.* ,b.amount,b.freazon_amount
+        from t_user_info u
+        left join t_user_balance_info b on b.user_id=u.user_id
+        <where>
+            proxy in(0,1)
+            <if test="account !=null and account.trim() !=''">
+                and account=#{account}
+            </if>
+            <if test="phone !=null and phone.trim() !=''">
+                and phone=#{phone}
+            </if>
+            <if test="inviteCode !=null and inviteCode.trim() !=''">
+                and invite_code=#{inviteCode}
+            </if>
+            <if test="proxy !=null">
+                and proxy=#{proxy}
+            </if>
+        </where>
+    </select>
+</mapper>

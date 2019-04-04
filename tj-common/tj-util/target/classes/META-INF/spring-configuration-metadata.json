@@ -1,0 +1,75 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "com.tj.util.mail.SacMailProperties",
+      "name": "sac.mail",
+      "type": "com.tj.util.mail.SacMailProperties"
+    },
+    {
+      "sourceType": "com.tj.util.properties.WalletProperties",
+      "name": "wallet",
+      "type": "com.tj.util.properties.WalletProperties"
+    },
+    {
+      "sourceType": "com.tj.util.properties.WalletProperties",
+      "name": "wallet.application",
+      "sourceMethod": "getApplication()",
+      "type": "com.tj.util.properties.WalletProperties$Application"
+    },
+    {
+      "sourceType": "com.tj.util.properties.WalletProperties",
+      "name": "wallet.cross",
+      "sourceMethod": "getCross()",
+      "type": "com.tj.util.properties.WalletProperties$Cross"
+    },
+    {
+      "sourceType": "com.tj.util.properties.WalletProperties",
+      "name": "wallet.token",
+      "sourceMethod": "getToken()",
+      "type": "com.tj.util.properties.WalletProperties$Token"
+    },
+    {
+      "sourceType": "com.tj.util.zk.ZkProperties",
+      "name": "zk",
+      "type": "com.tj.util.zk.ZkProperties"
+    }
+  ],
+  "properties": [
+    {
+      "sourceType": "com.tj.util.mail.SacMailProperties",
+      "name": "sac.mail.host",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.tj.util.mail.SacMailProperties",
+      "name": "sac.mail.password",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.tj.util.mail.SacMailProperties",
+      "name": "sac.mail.username",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.tj.util.zk.ZkProperties",
+      "name": "zk.connection-timeout",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.tj.util.zk.ZkProperties",
+      "name": "zk.host",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.tj.util.zk.ZkProperties",
+      "name": "zk.namespace",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.tj.util.zk.ZkProperties",
+      "name": "zk.session-timeout",
+      "type": "java.lang.Integer"
+    }
+  ]
+}

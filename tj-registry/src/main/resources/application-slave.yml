@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: tj-registry
+server:
+  port: 9000
+eureka:
+  instance:
+    prefer-ip-address: true
+    ip-address: 172.31.43.162
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://172.31.34.8:7010/eureka/,http://172.31.43.162:7010/eureka/,http://172.31.42.184:7001/eureka/,http://172.31.34.207:7001/eureka/
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ["*"]

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj.event.dao.RaceRebateInfoMapperEx">
+
+
+    <update id="updateDive" parameterType="map">
+        update t_race_rebate_info
+        <set>
+            <if test="ratio !=null">
+                rule=json_set(rule, '$.rebateRatio', #{ratio}),
+            </if>
+            <if test="openStatus !=null">
+                open_status=#{openStatus}
+            </if>
+        </set>
+        where id = #{rebateId}
+    </update>
+</mapper>

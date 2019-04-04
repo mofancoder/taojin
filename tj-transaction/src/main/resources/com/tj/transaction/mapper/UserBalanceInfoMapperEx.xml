@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj.transaction.dao.UserBalanceInfoMapperEx">
+    <update id="addSysMerchantAmount" parameterType="map">
+        UPDATE t_user_balance_info
+        SET amount=amount + #{amount}
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="subSysMerchantAmount" parameterType="map">
+        UPDATE t_user_balance_info
+        SET amount=amount - #{amount}
+        WHERE user_id = #{userId}
+          and amount >= #{amount}
+    </update>
+
+    <update id="addChargeAmount" parameterType="map">
+        UPDATE t_user_balance_info
+        SET amount=amount + #{amount}
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="freezeWithdrawAmount" parameterType="map">
+        update t_user_balance_info
+        set amount=amount - #{amount},
+            freazon_amount=freazon_amount + #{amount}
+        where user_id = #{userId}
+          and amount >= #{amount}
+    </update>
+    <update id="releaseWithdrawAmount" parameterType="map">
+        update t_user_balance_info
+        set freazon_amount=freazon_amount - #{amount}
+        where user_id = #{userId}
+          and freazon_amount >= #{amount}
+    </update>
+    <update id="rollbackAmount" parameterType="map">
+        update t_user_balance_info
+        set freazon_amount=freazon_amount - #{amount},
+            amount=amount + #{amount}
+        where user_id = #{userId}
+          and freazon_amount >= #{amount}
+    </update>
+</mapper>

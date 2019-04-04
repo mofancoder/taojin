@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj.bet.dao.BetRecdMapperEx">
+    <resultMap id="base" type="com.tj.dto.BetRecdDto">
+        <result property="createTime" jdbcType="TIMESTAMP" column="create_time"/>
+        <result property="userId" jdbcType="INTEGER" column="user_id"/>
+        <result property="betResult" jdbcType="INTEGER" column="bet_result"/>
+        <result property="betType" jdbcType="INTEGER" column="bet_type"/>
+        <result property="content" jdbcType="VARCHAR" column="content"/>
+        <result property="id" jdbcType="VARCHAR" column="id"/>
+        <result property="raceId" jdbcType="VARCHAR" column="race_id"/>
+        <result property="rebateStatus" jdbcType="INTEGER" column="rebate_status"/>
+    </resultMap>
+    <resultMap id="adminRecdMap" type="com.tj.dto.AdminBetRecdDto">
+        <result property="createTime" jdbcType="TIMESTAMP" column="create_time"/>
+        <result property="userId" jdbcType="INTEGER" column="user_id"/>
+        <result property="betResult" jdbcType="INTEGER" column="bet_result"/>
+        <result property="betType" jdbcType="INTEGER" column="bet_type"/>
+        <result property="content" jdbcType="VARCHAR" column="content"/>
+        <result property="id" jdbcType="VARCHAR" column="id"/>
+        <result property="raceId" jdbcType="VARCHAR" column="race_id"/>
+        <result property="rebateStatus" jdbcType="INTEGER" column="rebate_status"/>
+        <result property="account" jdbcType="VARCHAR" column="account"/>
+        <result property="phone" jdbcType="VARCHAR" column="phone"/>
+    </resultMap>
+    <resultMap id="adminRecdInfoMap" type="com.tj.dto.AdminBetRecdInfo">
+        <result property="balanceAmount" column="balance_amount" jdbcType="DECIMAL"/>
+        <result property="betAmount" column="bet_amount" jdbcType="DECIMAL"/>
+        <result property="betLoseAmount" column="bet_lose_amount" jdbcType="DECIMAL"/>
+        <result property="betWinAmount" column="bet_win_amount" jdbcType="DECIMAL"/>
+        <result property="countNum" column="count_num" jdbcType="INTEGER"/>
+    </resultMap>
+    <resultMap id="rebateInfoMap" type="com.tj.dto.RebateBetInfo">
+        <result property="betWinAmount" jdbcType="DECIMAL" column="bet_win_amount"/>
+        <result property="betLoseAmount" jdbcType="DECIMAL" column="bet_lose_amount"/>
+        <result property="betAmount" jdbcType="DECIMAL" column="bet_amount"/>
+        <result property="balanceAmount" jdbcType="DECIMAL" column="balance_amount"/>
+        <result property="betCount" jdbcType="DECIMAL" column="bet_count"/>
+        <result property="rebateId" jdbcType="INTEGER" column="rebate_id"/>
+    </resultMap>
+    <select id="adminList" resultMap="adminRecdMap" parameterType="map">
+        SELECT
+        r.id ,
+        r.user_id,
+        u.account,
+        u.phone,
+        r.race_id,
+        r.bet_type,
+        r.bet_content as content,
+        r.bet_result,
+        r.create_time,
+        r.rebate_status
+        FROM t_bet_recd r
+        LEFT JOIN t_user_info u ON u.user_id=r.user_id
+        <where>
+            <if test="betId !=null">
+                r.id=#{betId}
+            </if>
+            <if test="phone !=null">
+                AND u.phone=#{phone}
+            </if>
+            <if test="account !=null">
+                AND u.account=#{account}
+            </if>
+            <if test="raceId !=null">
+                AND r.race_id=#{raceId}
+            </if>
+            <if test="score !=null">
+                AND r.bet_content->'$.score'=#{score}
+            </if>
+            <if test="betType !=null">
+                AND r.bet_type=#{betType}
+            </if>
+            <if test="betResult !=null">
+                AND r.bet_result=#{betResult}
+            </if>
+            <if test="rebateStatus !=null">
+                AND r.rebate_status=#{rebateStatus}
+            </if>
+            <if test="startTime !=null">
+                AND r.create_time &gt;=#{startTime}
+            </if>
+            <if test="endTime !=null">
+                AND r.create_time &lt;=#{endTime}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+    <select id="sumBetRecd" resultMap="adminRecdInfoMap" parameterType="map">
+        select
+        sum(r.bet_amount) as bet_amount,
+        sum(if(r.bet_result=0,bet_amount,0)) as bet_lose_amount,
+        sum(if(r.bet_result=1,r.bet_content->'$.expecAmount',0)) as bet_win_amount,
+        sum(if(r.bet_result=1,r.bet_content->'$.expecAmount',0)) - sum(r.bet_amount) as balance_amount,
+        count(0) as count_num
+        FROM t_bet_recd r
+        LEFT JOIN t_user_info u ON u.user_id=r.user_id
+        <where>
+            <if test="betId !=null">
+                r.id=#{betId}
+            </if>
+            <if test="phone !=null">
+                AND u.phone=#{phone}
+            </if>
+            <if test="account !=null">
+                AND u.account=#{account}
+            </if>
+            <if test="raceId !=null">
+                AND r.race_id=#{raceId}
+            </if>
+            <if test="score !=null">
+                AND r.bet_content->'$.score'=#{score}
+            </if>
+            <if test="betType !=null">
+                AND r.bet_type=#{betType}
+            </if>
+            <if test="betResult !=null">
+                AND r.bet_result=#{betResult}
+            </if>
+            <if test="rebateStatus !=null">
+                AND r.rebate_status=#{rebateStatus}
+            </if>
+            <if test="startTime !=null">
+                AND r.create_time &gt;=#{startTime}
+            </if>
+            <if test="endTime !=null">
+                AND r.create_time &lt;=#{endTime}
+            </if>
+        </where>
+    </select>
+    <select id="userSumBetRecd" resultMap="adminRecdInfoMap" parameterType="map">
+        select
+        sum(r.bet_amount) as bet_amount,
+        sum(if(r.bet_result=0,bet_amount,0)) as bet_lose_amount,
+        sum(if(r.bet_result=1,r.bet_content->'$.expecAmount',0)) as bet_win_amount,
+        sum(if(r.bet_result=1,r.bet_content->'$.expecAmount',0)) - sum(r.bet_amount) as balance_amount,
+        count(0) as count_num
+        FROM t_bet_recd r
+        LEFT JOIN t_user_info u ON u.user_id=r.user_id
+        <where>
+            <if test="userId !=null">
+                r.user_id=#{userId}
+            </if>
+            <if test="type !=null">
+                and r.bet_type=#{type}
+            </if>
+            <if test="startTime !=null">
+                AND r.create_time &gt;=#{startTime}
+            </if>
+            <if test="endTime !=null">
+                AND r.create_time &lt;=#{endTime}
+            </if>
+        </where>
+    </select>
+    <select id="getRebateBetInfo" resultMap="rebateInfoMap" parameterType="map">
+        select
+        rebate_id,
+        sum(bet_amount) as bet_amount,
+        count(id) as bet_count,
+        sum(if(bet_result=1,bet_content->'$.expecAmount',0)) as bet_win_amount,
+        sum(if(bet_result=0,bet_amount,0)) as bet_lose_amount,
+        sum(bet_amount)-sum(if(bet_result=1,bet_content->'$.expecAmount',0)) as balance_amount,
+        cast(avg(bet_content->'$.rebateRatio') as decimal(10,2)) as avg_rebate_ratio
+        from t_bet_recd
+        where bet_status = 1 and
+        rebate_id in
+        <foreach collection="rebateIds" item="rebateId" open="(" close=")" separator=",">
+            #{rebateId}
+        </foreach>
+        group by rebate_id
+    </select>
+</mapper>
